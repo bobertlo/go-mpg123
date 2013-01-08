@@ -1,5 +1,8 @@
-mpg123-go: libmpg123 bindings for go
-====================================
+mpg123-go
+=========
+
+Introduction
+------------
 
 mpg123-go is a library that provides bindings to libmpg123.
 
@@ -10,21 +13,15 @@ supported.
 
 This library is still very much a work in progress.
 
-Usage
------
+Examples
+--------
 
-	decoder, err := mpg123.NewMpg123("")
-	if err != nil {
-		panic("error initializing mpg123 decoder")
-	}
-	err = decoder.Open("test.mp3")
-	if err != nil {
-		panic("error opening mp3 file")
-	}
-	defer decoder.Close()
-	buf := make([]byte, 1024)
-	len, err := decoder.Read(buf)
-	if err != nil && err != mpg123.EOF {
-		panic("error decoding mp3")
-	}
+An example program is included in examples/rawdump. This program decodes
+an MP3 file and writes the raw PCM data to a file.
 
+	go get github.com/go-mpg123/examples/rawdump
+	rawdump <file.mp3> <outfile.raw>
+
+This raw audio file may be played using mplayer:
+
+	mplayer -demuxer rawaudio -rawaudio rate=<samplerate>:channels=<channels> out.raw
