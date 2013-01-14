@@ -9,7 +9,7 @@ import (
 func main() {
 	// check command-line arguments
 	if len(os.Args) != 3 {
-		fmt.Fprintln(os.Stderr, "usage: rawdump <infile.mp3> <outfile.raw>")
+		fmt.Fprintln(os.Stderr, "usage: mp3dump <infile.mp3> <outfile.raw>")
 		return
 	}
 
