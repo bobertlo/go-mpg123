@@ -13,11 +13,11 @@ This library is still very much a work in progress.
 Usage
 -----
 
-The mpg123 library is accessed via an Mpg123 object containing a handle
-for the instance of the library. To decode a file, first create an 
-instance of the decoder tell it to open the file.
+The mpg123 library is accessed via a Decoder struct containing a C pointer
+to an instance of the library. To decode a file, first create an instance of the decoder,
+then tell it to open the file.
 
-	decoder, err := mpg123.NewMpg123("")
+	decoder, err := mpg123.NewDecoder("")
 	err = decoder.Open("test.mp3")
 
 At this point you should have the decoder peek into the file and find

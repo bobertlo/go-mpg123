@@ -14,7 +14,7 @@ func main() {
 	}
 
 	// create mpg123 decoder instance
-	decoder, err := mpg123.NewMpg123("")
+	decoder, err := mpg123.NewDecoder("")
 	if err != nil {
 		panic("could not initialize mpg123")
 	}
@@ -52,4 +52,6 @@ func main() {
 			break
 		}
 	}
+	o.Close()
+	decoder.Delete()
 }
