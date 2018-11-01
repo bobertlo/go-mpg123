@@ -45,7 +45,7 @@ type Decoder struct {
 	handle *C.mpg123_handle
 }
 
-// Initialize the mpg123 library when package is loaded
+// init initializes the mpg123 library when package is loaded
 func init() {
 	err := C.mpg123_init()
 	if err != C.MPG123_OK {
@@ -59,7 +59,7 @@ func init() {
 // DECODER INSTANCE CODE //
 ///////////////////////////
 
-// Create a new mpg123 decoder instance
+// NewDecoder creates a new mpg123 decoder instance
 func NewDecoder(decoder string) (*Decoder, error) {
 	var err C.int
 	var mh *C.mpg123_handle
@@ -80,7 +80,7 @@ func NewDecoder(decoder string) (*Decoder, error) {
 	return dec, nil
 }
 
-// Delete mpg123 decoder instance
+// Delete frees an mpg123 decoder instance
 func (d *Decoder) Delete() {
 	C.mpg123_delete(d.handle)
 }
@@ -95,17 +95,17 @@ func (d *Decoder) strerror() string {
 // OUTPUT FORMAT CODE //
 ////////////////////////
 
-// Disable all decoder output formats. Use before specifying supported formats
+// FormatNone disables all decoder output formats (used to specifying supported formats)
 func (d *Decoder) FormatNone() {
 	C.mpg123_format_none(d.handle)
 }
 
-// Enable all decoder output formats. This is the default setting.
+// FromatAll enables all decoder output formats (this is the default setting)
 func (d *Decoder) FormatAll() {
 	C.mpg123_format_all(d.handle)
 }
 
-// Returns current output format
+// GetFormat returns current output format
 func (d *Decoder) GetFormat() (rate int64, channels int, encoding int) {
 	var cRate C.long
 	var cChans, cEnc C.int
@@ -113,7 +113,7 @@ func (d *Decoder) GetFormat() (rate int64, channels int, encoding int) {
 	return int64(cRate), int(cChans), int(cEnc)
 }
 
-// Set the audio output format for decoder
+// Format sets the audio output format for decoder
 func (d *Decoder) Format(rate int64, channels int, encodings int) {
 	C.mpg123_format(d.handle, C.long(rate), C.int(channels), C.int(encodings))
 }
@@ -122,7 +122,7 @@ func (d *Decoder) Format(rate int64, channels int, encodings int) {
 // INPUT AND DECODING CODE //
 /////////////////////////////
 
-// Open an mp3 file for decoding using a filename
+// Open initializes a decoder for an mp3 file using a filename
 func (d *Decoder) Open(file string) error {
 	cfile := C.CString(file)
 	defer C.free(unsafe.Pointer(cfile))
@@ -133,7 +133,7 @@ func (d *Decoder) Open(file string) error {
 	return nil
 }
 
-// Bind an open *os.File for decoding
+// OpenFile binds to an fd from an open *os.File for decoding
 func (d *Decoder) OpenFile(f *os.File) error {
 	err := C.mpg123_open_fd(d.handle, C.int(f.Fd()))
 	if err != C.MPG123_OK {
@@ -142,7 +142,7 @@ func (d *Decoder) OpenFile(f *os.File) error {
 	return nil
 }
 
-// Prepare for direct feeding via Feed
+// OpenFeed prepares a decoder for direct feeding via Feed(..)
 func (d *Decoder) OpenFeed() error {
 	err := C.mpg123_open_feed(d.handle)
 	if err != C.MPG123_OK {
@@ -151,7 +151,7 @@ func (d *Decoder) OpenFeed() error {
 	return nil
 }
 
-// Close input file if one was opened by mpg123
+// Close closes an input file if one was opened by mpg123
 func (d *Decoder) Close() error {
 	err := C.mpg123_close(d.handle)
 	if err != C.MPG123_OK {
@@ -160,7 +160,7 @@ func (d *Decoder) Close() error {
 	return nil
 }
 
-// Read data from stream and decode into buf. Returns number of bytes decoded.
+// Read decodes data and into buf and returns number of bytes decoded.
 func (d *Decoder) Read(buf []byte) (int, error) {
 	var done C.size_t
 	err := C.mpg123_read(d.handle, (*C.uchar)(&buf[0]), C.size_t(len(buf)), &done)
@@ -173,7 +173,7 @@ func (d *Decoder) Read(buf []byte) (int, error) {
 	return int(done), nil
 }
 
-// Feed bytes into the decoder
+// Feed provides data bytes into the decoder
 func (d *Decoder) Feed(buf []byte) error {
 	err := C.mpg123_feed(d.handle, (*C.uchar)(unsafe.Pointer(&buf[0])), C.size_t(len(buf)))
 	if err != C.MPG123_OK {
