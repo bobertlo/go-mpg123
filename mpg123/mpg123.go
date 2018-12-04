@@ -72,8 +72,9 @@ func NewDecoder(decoder string) (*Decoder, error) {
 	}
 	if mh == nil {
 		errstring := C.mpg123_plain_strerror(err)
-		defer C.free(unsafe.Pointer(errstring))
-		return nil, fmt.Errorf("Error initializing mpg123 decoder: %s", errstring)
+		err := C.GoString(errstring)
+		C.free(unsafe.Pointer(errstring))
+		return nil, fmt.Errorf("Error initializing mpg123 decoder: %s", err)
 	}
 	dec := new(Decoder)
 	dec.handle = mh
