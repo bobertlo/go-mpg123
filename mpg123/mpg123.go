@@ -164,7 +164,7 @@ func (d *Decoder) Close() error {
 // Read decodes data and into buf and returns number of bytes decoded.
 func (d *Decoder) Read(buf []byte) (int, error) {
 	var done C.size_t
-	err := C.mpg123_read(d.handle, (*C.uchar)(&buf[0]), C.size_t(len(buf)), &done)
+	err := C.mpg123_read(d.handle, unsafe.Pointer(&buf[0]), C.size_t(len(buf)), &done)
 	if err == C.MPG123_DONE {
 		return int(done), EOF
 	}
