@@ -5,6 +5,10 @@ package mpg123
 /*
 #include <mpg123.h>
 #cgo LDFLAGS: -lmpg123
+
+int do_mpg123_read(mpg123_handle *mh, void *outmemory, size_t outmemsize, size_t *done) {
+	return mpg123_read(mh, outmemory, outmemsize, done);
+}
 */
 import "C"
 
@@ -74,7 +78,7 @@ func NewDecoder(decoder string) (*Decoder, error) {
 		errstring := C.mpg123_plain_strerror(err)
 		err := C.GoString(errstring)
 		C.free(unsafe.Pointer(errstring))
-		return nil, fmt.Errorf("Error initializing mpg123 decoder: %s", err)
+		return nil, fmt.Errorf("error initializing mpg123 decoder: %s", err)
 	}
 	dec := new(Decoder)
 	dec.handle = mh
@@ -129,7 +133,7 @@ func (d *Decoder) Open(file string) error {
 	defer C.free(unsafe.Pointer(cfile))
 	err := C.mpg123_open(d.handle, cfile)
 	if err != C.MPG123_OK {
-		return fmt.Errorf("Error opening %s: %s\n", file, d.strerror())
+		return fmt.Errorf("error opening %s: %s", file, d.strerror())
 	}
 	return nil
 }
@@ -138,7 +142,7 @@ func (d *Decoder) Open(file string) error {
 func (d *Decoder) OpenFile(f *os.File) error {
 	err := C.mpg123_open_fd(d.handle, C.int(f.Fd()))
 	if err != C.MPG123_OK {
-		return fmt.Errorf("Error attaching file: %s", d.strerror())
+		return fmt.Errorf("error attaching file: %s", d.strerror())
 	}
 	return nil
 }
@@ -164,7 +168,7 @@ func (d *Decoder) Close() error {
 // Read decodes data and into buf and returns number of bytes decoded.
 func (d *Decoder) Read(buf []byte) (int, error) {
 	var done C.size_t
-	err := C.mpg123_read(d.handle, (*C.uchar)(&buf[0]), C.size_t(len(buf)), &done)
+	err := C.do_mpg123_read(d.handle, (unsafe.Pointer)(&buf[0]), C.size_t(len(buf)), &done)
 	if err == C.MPG123_DONE {
 		return int(done), EOF
 	}
